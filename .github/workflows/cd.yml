@@ -130,6 +130,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
+          pattern: xentry-*
           merge-multiple: true
 
       - name: Create checksums
