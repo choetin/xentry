@@ -1,0 +1,41 @@
+{{define "title"}}Transaction Detail — Xentry{{end}}
+{{define "content"}}
+<div class="px-4 md:px-6 py-8">
+    <a href="/projects/{{.ProjectID}}/transactions" class="text-sm text-blue-600 hover:text-blue-500">&larr; {{T "transactions.back_to_transactions"}}</a>
+    {{with .Data.TX}}
+    <h1 class="mt-4 text-2xl font-bold text-gray-900 dark:text-gray-100">{{.Name}}</h1>
+    <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+        <span>{{.Op}}</span> ·
+        <span>{{printf "%.1f" .Duration}}ms</span> ·
+        <span class="px-2 py-1 text-xs font-medium rounded-full
+            {{if eq .Status "ok"}}bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300
+            {{else if eq .Status "error"}}bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300
+            {{else}}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300{{end}}">{{.Status}}</span>
+        {{if .Environment}} · <span>{{.Environment}}</span>{{end}}
+    </div>
+    <div class="mt-2 text-xs text-gray-400 dark:text-gray-500 font-mono">Trace: {{.TraceID}}</div>
+    {{end}}
+    <h2 class="mt-8 text-lg font-semibold text-gray-900 dark:text-gray-100">{{T "transactions.waterfall"}}</h2>
+    <div class="mt-4 bg-white dark:bg-gray-900 rounded-lg shadow p-6">
+        {{if .Data.Spans}}
+        <div class="relative" style="min-height: 100px;">
+            {{range .Data.Spans}}
+            <div class="flex items-center gap-2 py-1">
+                <span class="w-32 text-xs text-gray-600 dark:text-gray-300 truncate">{{if .Op}}{{.Op}}{{else}}{{.Description}}{{end}}</span>
+                <div class="flex-1 relative h-6">
+                    <div class="absolute h-4 rounded
+                        {{if eq .Status "ok"}}bg-green-400
+                        {{else if eq .Status "error"}}bg-red-400
+                        {{else}}bg-yellow-400{{end}}"
+                        style="left: {{printf "%.1f" .LeftPct}}%; width: {{printf "%.1f" .WidthPct}}%"></div>
+                </div>
+                <span class="w-20 text-xs text-right text-gray-500 dark:text-gray-400">{{printf "%.1f" .Duration}}ms</span>
+            </div>
+            {{end}}
+        </div>
+        {{else}}
+        <p class="text-gray-400">{{T "transactions.no_spans"}}</p>
+        {{end}}
+    </div>
+</div>
+{{end}}

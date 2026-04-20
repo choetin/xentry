@@ -1,0 +1,79 @@
+{{define "title"}}{{.OrgName}} Projects — Xentry{{end}}
+{{define "content"}}
+<div class="max-w-7xl mx-auto px-4 md:px-6 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{.OrgName}} — {{T "orgs.projects_title"}}</h1>
+    <div class="mt-6">
+        <div class="bg-white dark:bg-gray-900 rounded-lg shadow p-6 mb-6">
+            <h2 class="text-lg font-semibold dark:text-gray-200">{{T "orgs.create_project"}}</h2>
+            <form id="create-project-form" hx-post="/api/organizations/{{.OrgID}}/projects" hx-target="#create-project-result" class="flex items-end gap-4 flex-wrap mt-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{T "table.name"}}</label>
+                    <input type="text" name="name" required
+                           class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{T "table.slug"}}</label>
+                    <input type="text" name="slug" required
+                           class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{T "table.platform"}}</label>
+                    <select name="platform"
+                            class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="other">{{T "platform.other"}}</option>
+                        <option value="windows">{{T "platform.windows"}}</option>
+                        <option value="macos">{{T "platform.macos"}}</option>
+                        <option value="linux">{{T "platform.linux"}}</option>
+                        <option value="android">{{T "platform.android"}}</option>
+                        <option value="ios">{{T "platform.ios"}}</option>
+                    </select>
+                </div>
+                <button type="submit"
+                        class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
+                    {{T "btn.create"}}
+                </button>
+            </form>
+            <div id="create-project-result" class="mt-2"></div>
+        </div>
+    </div>
+    <div class="mt-4">
+        {{if .Data.Projects}}
+        {{.Data.Pagination}}
+        <div class="bg-white dark:bg-gray-900 rounded-lg shadow overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{T "table.name"}}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{T "table.slug"}}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{T "table.platform"}}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{T "table.actions"}}</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
+                    {{range .Data.Projects}}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                        <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">{{.Name}}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{{.Slug}}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{{.Platform}}</td>
+                        <td class="px-6 py-4 text-sm">
+                            <a href="/projects/{{.ID}}/issues" class="text-blue-600 hover:text-blue-500">{{T "nav.issues"}}</a>
+                            <span class="text-gray-300 dark:text-gray-600 mx-2">|</span>
+                            <a href="/projects/{{.ID}}/settings" class="text-blue-600 hover:text-blue-500">{{T "nav.settings"}}</a>
+                            <span class="text-gray-300 dark:text-gray-600 mx-2">|</span>
+                            <button hx-delete="/api/projects/{{.ID}}"
+                                    hx-confirm='{{T "orgs.delete_project_confirm"}}'
+                                    class="text-red-600 hover:text-red-500 font-medium">
+                                {{T "btn.delete"}}
+                            </button>
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+        {{else}}
+        <p class="text-gray-500 dark:text-gray-400">{{T "orgs.no_projects"}}</p>
+        {{end}}
+    </div>
+</div>
+{{end}}

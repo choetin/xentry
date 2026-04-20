@@ -1,0 +1,13 @@
+services:
+  xentry:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - xentry-data:/data
+    environment:
+      - XENTRY_JWT_SECRET=change-me-in-production
+      - XENTRY_ENV=production
+
+volumes:
+  xentry-data:

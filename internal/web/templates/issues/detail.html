@@ -1,0 +1,84 @@
+{{define "title"}}Issue Detail — Xentry{{end}}
+{{define "content"}}
+<div class="px-4 md:px-6 py-8">
+    <a href="/projects/{{.ProjectID}}/issues" class="text-sm text-blue-600 hover:text-blue-500">{{T "issues.back_to_issues"}}</a>
+    {{with .Data.Issue}}
+    <div class="mt-4">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{.Title}}</h1>
+        <div class="mt-4 flex flex-wrap items-center gap-4">
+            <span class="px-3 py-1 rounded-full text-xs font-medium
+                {{if eq .Level "fatal"}}bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300
+                {{else if eq .Level "error"}}bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300
+                {{else if eq .Level "warning"}}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300
+                {{else}}bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200{{end}}">{{.Level}}</span>
+            <span class="px-3 py-1 rounded-full text-xs font-medium
+                {{if eq .Status "unresolved"}}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300
+                {{else if eq .Status "resolved"}}bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300
+                {{else}}bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200{{end}}">{{.Status}}</span>
+            <span class="text-sm text-gray-500 dark:text-gray-400">{{T "table.type"}}: <strong>{{.Type}}</strong></span>
+            <span class="text-sm text-gray-500 dark:text-gray-400">{{T "table.events"}}: <strong>{{.Count}}</strong></span>
+            <span class="text-sm text-gray-500 dark:text-gray-400">{{T "table.first_seen"}}: <strong>{{formatTime .FirstSeen}}</strong></span>
+            <span class="text-sm text-gray-500 dark:text-gray-400">{{T "table.last_seen"}}: <strong>{{formatTime .LastSeen}}</strong></span>
+        </div>
+    </div>
+    {{end}}
+
+    <!-- Events -->
+    {{with .Data.Events}}
+    <div class="mt-8">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{{T "issues.events"}}</h2>
+        {{if .}}
+        <div class="space-y-4">
+            {{range $i, $ev := .}}
+            <div class="bg-white dark:bg-gray-900 rounded-lg shadow p-6">
+                <div class="flex flex-wrap items-center gap-4 mb-3">
+                    <span class="text-xs font-mono text-gray-400">{{$ev.ID}}</span>
+                    <span class="text-sm text-gray-500 dark:text-gray-400">{{T "table.timestamp"}}: {{formatTime $ev.Timestamp}}</span>
+                    {{if $ev.Release}}
+                    <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">{{$ev.Release}}</span>
+                    {{end}}
+                    {{if $ev.Platform}}
+                    <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">{{$ev.Platform}}</span>
+                    {{end}}
+                    {{if $ev.Environment}}
+                    <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300">{{$ev.Environment}}</span>
+                    {{end}}
+                </div>
+                {{if $ev.Message}}
+                <p class="text-sm text-gray-800 dark:text-gray-200 font-medium mb-3">{{$ev.Message}}</p>
+                {{end}}
+                {{if $ev.Annotations}}
+                <div class="mt-2">
+                    <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-2">{{T "issues.annotations"}}</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                        {{range $key, $val := $ev.Annotations}}
+                        <div class="bg-gray-50 dark:bg-gray-800 rounded px-3 py-2 text-sm">
+                            <span class="text-gray-500 dark:text-gray-400">{{$key}}:</span>
+                            <span class="ml-1 text-gray-900 dark:text-gray-100 font-medium break-all">{{$val}}</span>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
+                {{end}}
+            </div>
+            {{end}}
+        </div>
+        {{else}}
+        <p class="text-sm text-gray-400">{{T "issues.no_events"}}</p>
+        {{end}}
+    </div>
+    {{end}}
+
+    <!-- Stacktrace -->
+    <div class="mt-8">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{{T "issues.stacktrace"}}</h2>
+        <div class="bg-gray-900 dark:bg-gray-800 rounded-lg p-4 text-sm font-mono overflow-x-auto">
+            {{if .Data.StackwalkOutput}}
+            <pre class="text-gray-200 whitespace-pre-wrap break-all">{{.Data.StackwalkOutput}}</pre>
+            {{else}}
+            <p class="text-gray-400">{{T "issues.no_stacktrace"}}</p>
+            {{end}}
+        </div>
+    </div>
+</div>
+{{end}}

@@ -1,0 +1,203 @@
+{{define "title"}}{{.ProjectName}} Settings — Xentry{{end}}
+{{define "content"}}
+<div class="max-w-7xl mx-auto px-4 md:px-6 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{.ProjectName}} — {{T "settings.title"}}</h1>
+
+    <div class="mt-8 grid grid-cols-1 gap-8">
+        <!-- DSN -->
+        <div class="bg-white dark:bg-gray-900 rounded-lg shadow p-6">
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">{{T "settings.dsn_title"}}</h2>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{T "settings.dsn_help"}}</p>
+            <div class="mt-4 flex items-center gap-3">
+                <code class="flex-1 bg-gray-100 dark:bg-gray-800 rounded-md px-4 py-2 text-sm font-mono select-all break-all text-gray-900 dark:text-gray-100">{{.Data.DSN}}</code>
+                <button onclick="navigator.clipboard.writeText('{{.Data.DSN}}'); this.textContent = 'Copied!'; setTimeout(() => this.textContent = '{{T "btn.copy"}}', 2000)"
+                        class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap">
+                    {{T "btn.copy"}}
+                </button>
+            </div>
+
+            <div class="mt-6">
+                <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{T "settings.crashpad_url"}}</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{T "settings.crashpad_help"}}</p>
+                <div class="mt-2 flex items-center gap-3">
+                    <code class="flex-1 bg-gray-100 dark:bg-gray-800 rounded-md px-4 py-2 text-sm font-mono select-all break-all text-gray-900 dark:text-gray-100">{{.Data.CrashpadURL}}</code>
+                    <button onclick="navigator.clipboard.writeText('{{.Data.CrashpadURL}}'); this.textContent = 'Copied!'; setTimeout(() => this.textContent = '{{T "btn.copy"}}', 2000)"
+                            class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap">
+                        {{T "btn.copy"}}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Tokens -->
+        <div class="bg-white dark:bg-gray-900 rounded-lg shadow p-6">
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">{{T "settings.api_tokens"}}</h2>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{T "settings.tokens_help"}}</p>
+
+            <form class="mt-4 flex items-end gap-4"
+                  hx-post="/api/projects/{{.ProjectID}}/tokens"
+                  hx-target="#create-token-result">
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{T "settings.token_name"}}</label>
+                    <input type="text" name="name" required
+                           class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button type="submit"
+                        class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
+                    {{T "settings.create_token"}}
+                </button>
+            </form>
+            <div id="create-token-result" class="mt-2"></div>
+
+            {{if .Data.Tokens}}
+            <div class="mt-6 overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+                    <thead class="bg-gray-50 dark:bg-gray-800">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{T "table.name"}}</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{T "table.created"}}</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{T "table.actions"}}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
+                        {{range .Data.Tokens}}
+                        <tr>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-100">{{.Name}}</td>
+                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{.CreatedAt}}</td>
+                            <td class="px-4 py-3 text-sm">
+                                <button hx-delete="/api/projects/{{$.ProjectID}}/tokens/{{.ID}}"
+                                        hx-confirm="{{T "settings.delete_confirm"}}"
+                                        class="text-red-600 hover:text-red-500 font-medium">
+                                    {{T "settings.delete"}}
+                                </button>
+                            </td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+            {{end}}
+        </div>
+
+        <!-- Symbol Files -->
+        <div class="bg-white dark:bg-gray-900 rounded-lg shadow p-6">
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">{{T "settings.symbols_title"}}</h2>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{T "settings.symbols_help"}}</p>
+
+            <div class="mt-4 flex items-end gap-4">
+                <div class="flex-1">
+                    <input type="file" id="symbol-file" name="file" accept=".sym" required
+                           class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button id="symbol-upload-btn" type="button" onclick="uploadSymbol('{{.ProjectID}}')"
+                        class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 whitespace-nowrap">
+                    {{T "settings.upload_symbol"}}
+                </button>
+            </div>
+
+            <!-- Progress bar -->
+            <div id="symbol-progress" class="mt-3 hidden">
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div id="symbol-progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-200" style="width:0%"></div>
+                </div>
+                <p id="symbol-progress-text" class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{T "settings.uploading"}}</p>
+            </div>
+
+            <!-- Result message -->
+            <div id="symbol-upload-result" class="mt-2"></div>
+
+            {{if .Data.Symbols}}
+            <div id="symbol-table" class="mt-6 overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+                    <thead class="bg-gray-50 dark:bg-gray-800">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Debug ID</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{T "table.type"}}</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{T "table.release"}}</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{T "table.created"}}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
+                        {{range .Data.Symbols}}
+                        <tr>
+                            <td class="px-4 py-3 text-sm font-mono text-gray-900 dark:text-gray-100">{{.DebugID}}</td>
+                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{.Type}}</td>
+                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{.Release}}</td>
+                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{formatTime .UploadedAt}}</td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+            {{else}}
+            <p id="symbol-no-data" class="mt-4 text-sm text-gray-400 dark:text-gray-500">{{T "settings.no_symbols"}}</p>
+            {{end}}
+        </div>
+
+        <script>
+        function uploadSymbol(projectID) {
+            var input = document.getElementById('symbol-file');
+            var btn = document.getElementById('symbol-upload-btn');
+            var progressWrap = document.getElementById('symbol-progress');
+            var progressBar = document.getElementById('symbol-progress-bar');
+            var progressText = document.getElementById('symbol-progress-text');
+            var resultDiv = document.getElementById('symbol-upload-result');
+
+            var file = input.files[0];
+            if (!file) return;
+
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+            progressWrap.classList.remove('hidden');
+            resultDiv.textContent = '';
+            progressBar.style.width = '0%';
+
+            new Response(file.stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer().then(function(compressedData) {
+                var blob = new Blob([compressedData], {type: 'application/gzip'});
+                var formData = new FormData();
+                formData.append('file', blob, file.name + '.gz');
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/api/projects/' + projectID + '/symbols');
+
+                xhr.upload.addEventListener('progress', function(e) {
+                    if (e.lengthComputable) {
+                        var pct = Math.round((e.loaded / e.total) * 100);
+                        progressBar.style.width = pct + '%';
+                    }
+                });
+
+                xhr.addEventListener('load', function() {
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50');
+                    progressWrap.classList.add('hidden');
+                    input.value = '';
+
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        resultDiv.innerHTML = '<p class="text-sm text-green-600 dark:text-green-400">{{T "settings.upload_success"}}</p>';
+                        window.location.reload();
+                    } else {
+                        var msg = xhr.responseText || xhr.statusText;
+                        resultDiv.innerHTML = '<p class="text-sm text-red-600 dark:text-red-400">{{T "settings.upload_error"}}' + msg + '</p>';
+                    }
+                });
+
+                xhr.addEventListener('error', function() {
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50');
+                    progressWrap.classList.add('hidden');
+                    resultDiv.innerHTML = '<p class="text-sm text-red-600 dark:text-red-400">{{T "settings.upload_error"}}network error</p>';
+                });
+
+                xhr.send(formData);
+            }).catch(function(err) {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
+                progressWrap.classList.add('hidden');
+                resultDiv.innerHTML = '<p class="text-sm text-red-600 dark:text-red-400">{{T "settings.upload_error"}}' + err.message + '</p>';
+            });
+        }
+        </script>
+    </div>
+</div>
+{{end}}

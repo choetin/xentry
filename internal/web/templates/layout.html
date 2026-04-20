@@ -1,0 +1,220 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>{{block "title" .}}Xentry{{end}}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'media' }
+    </script>
+    <script src="https://unpkg.com/htmx.org@1.9.10/dist/htmx.min.js" defer></script>
+    <style>
+        #sidebar { transition: width 0.2s ease; }
+        #sidebar .nav-label { transition: opacity 0.15s ease; }
+        #sidebar.sidebar-collapsed .nav-label { opacity: 0; width: 0; overflow: hidden; white-space: nowrap; }
+        #sidebar.sidebar-collapsed .nav-item { justify-content: center; padding-left: 0; padding-right: 0; }
+        #sidebar.sidebar-collapsed .nav-section-label { opacity: 0; height: 0; margin: 0; overflow: hidden; }
+        #sidebar.sidebar-collapsed .user-info { opacity: 0; height: 0; overflow: hidden; margin: 0; }
+        #sidebar.sidebar-collapsed .logo-text { opacity: 0; width: 0; overflow: hidden; }
+        #sidebar-backdrop { transition: opacity 0.2s ease; }
+        #sidebar-backdrop.hidden { opacity: 0; pointer-events: none; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-950 min-h-screen text-gray-900 dark:text-gray-100">
+    <div class="flex h-screen overflow-hidden">
+        <div id="sidebar-backdrop" class="hidden fixed inset-0 bg-black/50 z-30 md:hidden" onclick="closeMobileSidebar()"></div>
+        <aside id="sidebar"
+               class="fixed md:static inset-y-0 left-0 z-40 w-60 bg-gray-900 dark:bg-gray-900 flex flex-col flex-shrink-0 border-r border-gray-700 -translate-x-full md:translate-x-0">
+            <div class="h-14 flex items-center px-4 border-b border-gray-700 flex-shrink-0">
+                <a href="/" class="flex items-center gap-2">
+                    <svg class="w-7 h-7 text-blue-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                    <span class="logo-text text-xl font-bold text-white tracking-tight transition-opacity">Xentry</span>
+                </a>
+            </div>
+            <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto overflow-x-hidden">
+                <a href="/"
+                   class="nav-item flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium {{if eq .ActiveNav "dashboard"}}bg-gray-700 text-white{{else}}text-gray-300 hover:bg-gray-700 hover:text-white{{end}}"
+                   onclick="closeMobileSidebar()">
+                    <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/>
+                    </svg>
+                    <span class="nav-label">{{T "nav.dashboard"}}</span>
+                </a>
+                <a href="/orgs"
+                   class="nav-item flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium {{if eq .ActiveNav "orgs"}}bg-gray-700 text-white{{else}}text-gray-300 hover:bg-gray-700 hover:text-white{{end}}"
+                   onclick="closeMobileSidebar()">
+                    <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/>
+                    </svg>
+                    <span class="nav-label">{{T "nav.organizations"}}</span>
+                </a>
+                {{if .ProjectID}}
+                <div class="nav-section-label mt-6 mb-1 px-3">
+                    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">{{T "nav.project"}}</span>
+                </div>
+                <a href="/projects/{{.ProjectID}}/issues"
+                   class="nav-item flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium {{if eq .ActiveNav "issues"}}bg-gray-700 text-white{{else}}text-gray-300 hover:bg-gray-700 hover:text-white{{end}}"
+                   onclick="closeMobileSidebar()">
+                    <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                    </svg>
+                    <span class="nav-label">{{T "nav.issues"}}</span>
+                </a>
+                <a href="/projects/{{.ProjectID}}/transactions"
+                   class="nav-item flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium {{if eq .ActiveNav "apm"}}bg-gray-700 text-white{{else}}text-gray-300 hover:bg-gray-700 hover:text-white{{end}}"
+                   onclick="closeMobileSidebar()">
+                    <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/>
+                    </svg>
+                    <span class="nav-label">{{T "nav.apm"}}</span>
+                </a>
+                <a href="/projects/{{.ProjectID}}/logs"
+                   class="nav-item flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium {{if eq .ActiveNav "logs"}}bg-gray-700 text-white{{else}}text-gray-300 hover:bg-gray-700 hover:text-white{{end}}"
+                   onclick="closeMobileSidebar()">
+                    <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                    </svg>
+                    <span class="nav-label">{{T "nav.logs"}}</span>
+                </a>
+                <a href="/projects/{{.ProjectID}}/releases"
+                   class="nav-item flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium {{if eq .ActiveNav "releases"}}bg-gray-700 text-white{{else}}text-gray-300 hover:bg-gray-700 hover:text-white{{end}}"
+                   onclick="closeMobileSidebar()">
+                    <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"/>
+                    </svg>
+                    <span class="nav-label">{{T "nav.releases"}}</span>
+                </a>
+                <a href="/projects/{{.ProjectID}}/settings"
+                   class="nav-item flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium {{if eq .ActiveNav "settings"}}bg-gray-700 text-white{{else}}text-gray-300 hover:bg-gray-700 hover:text-white{{end}}"
+                   onclick="closeMobileSidebar()">
+                    <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <span class="nav-label">{{T "nav.settings"}}</span>
+                </a>
+                {{end}}
+            </nav>
+            <div class="border-t border-gray-700 px-3 py-2 flex-shrink-0">
+                <a href="{{.LangSwitchURL}}"
+                   class="nav-item flex items-center gap-3 px-3 py-1 rounded-md text-sm text-gray-400 hover:bg-gray-700 hover:text-white"
+                   onclick="closeMobileSidebar()">
+                    <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 01-3.827-5.802"/>
+                    </svg>
+                    <span class="nav-label">{{T "lang.switch"}}</span>
+                </a>
+            </div>
+            <div class="border-t border-gray-700 px-3 py-3 flex-shrink-0">
+                {{if .User}}
+                <div class="user-info px-3 mb-2">
+                    <p class="text-sm font-medium text-white truncate">{{.User.Name}}</p>
+                    <p class="text-xs text-gray-400 truncate">{{.User.Email}}</p>
+                </div>
+                <a href="/logout"
+                   class="nav-item flex items-center gap-3 px-3 py-2 rounded-md text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
+                    <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
+                    </svg>
+                    <span class="nav-label">{{T "nav.logout"}}</span>
+                </a>
+                {{else}}
+                <a href="/login"
+                   class="nav-item flex items-center gap-3 px-3 py-2 rounded-md text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
+                    <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                    </svg>
+                    <span class="nav-label">{{T "nav.sign_in"}}</span>
+                </a>
+                {{end}}
+            </div>
+            <div class="hidden md:flex border-t border-gray-700 px-3 py-2 flex-shrink-0">
+                <button onclick="toggleSidebar()" class="nav-item flex items-center gap-3 px-3 py-2 rounded-md text-sm text-gray-400 hover:bg-gray-700 hover:text-white w-full">
+                    <svg id="collapse-icon" class="w-5 h-5 flex-shrink-0 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5"/>
+                    </svg>
+                    <span class="nav-label">{{T "nav.collapse"}}</span>
+                </button>
+            </div>
+        </aside>
+        <main class="flex-1 overflow-y-auto min-w-0">
+            <header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 md:px-6 py-3 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center gap-2">
+                    <button onclick="openMobileSidebar()" class="md:hidden p-1 -ml-1 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+                        </svg>
+                    </button>
+                    <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 min-w-0">
+                        {{if .OrgName}}
+                        <a href="/orgs" class="hover:text-gray-700 dark:hover:text-gray-200 truncate">Organizations</a>
+                        <span>/</span>
+                        <a href="/orgs/{{.OrgID}}/projects" class="hover:text-gray-700 dark:hover:text-gray-200 truncate">{{.OrgName}}</a>
+                        {{if .ProjectName}}
+                        <span>/</span>
+                        <span class="text-gray-900 dark:text-gray-100 font-medium truncate">{{.ProjectName}}</span>
+                        {{end}}
+                        {{end}}
+                    </div>
+                </div>
+            </header>
+            <div class="min-w-0">
+                {{block "content" .}}{{end}}
+            </div>
+            <footer class="border-t border-gray-200 dark:border-gray-800 px-4 md:px-6 py-3 text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">
+                &copy; {{T "footer.copyright"}} &middot; Xentry v{{.Version}}
+            </footer>
+        </main>
+    </div>
+    <script>
+        function initSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var icon = document.getElementById('collapse-icon');
+            if (!sidebar) return;
+            if (localStorage.getItem('xentry_sidebar') === 'collapsed') {
+                sidebar.classList.add('sidebar-collapsed');
+                sidebar.style.width = '4rem';
+                if (icon) icon.style.transform = 'rotate(180deg)';
+            }
+        }
+        function toggleSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var icon = document.getElementById('collapse-icon');
+            if (!sidebar) return;
+            sidebar.classList.toggle('sidebar-collapsed');
+            if (sidebar.classList.contains('sidebar-collapsed')) {
+                sidebar.style.width = '4rem';
+                localStorage.setItem('xentry_sidebar', 'collapsed');
+                if (icon) icon.style.transform = 'rotate(180deg)';
+            } else {
+                sidebar.style.width = '15rem';
+                localStorage.removeItem('xentry_sidebar');
+                if (icon) icon.style.transform = '';
+            }
+        }
+        function openMobileSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var backdrop = document.getElementById('sidebar-backdrop');
+            if (sidebar) { sidebar.classList.remove('-translate-x-full'); sidebar.classList.add('translate-x-0'); }
+            if (backdrop) backdrop.classList.remove('hidden');
+        }
+        function closeMobileSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var backdrop = document.getElementById('sidebar-backdrop');
+            if (sidebar && window.innerWidth < 768) {
+                sidebar.classList.add('-translate-x-full');
+                sidebar.classList.remove('translate-x-0');
+            }
+            if (backdrop) backdrop.classList.add('hidden');
+        }
+        initSidebar();
+    </script>
+</body>
+</html>
+{{end}}

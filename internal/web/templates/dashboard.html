@@ -1,0 +1,108 @@
+{{define "title"}}Dashboard — Xentry{{end}}
+{{define "content"}}
+<div class="px-4 md:px-6 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{T "dashboard.title"}}</h1>
+
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-white dark:bg-gray-900 rounded-lg shadow p-6">
+            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{{T "dashboard.unresolved_issues"}}</h3>
+            <p class="mt-2 text-3xl font-bold text-red-600">{{.Data.Stats.UnresolvedIssues}}</p>
+        </div>
+        <div class="bg-white dark:bg-gray-900 rounded-lg shadow p-6">
+            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{{T "dashboard.total_events"}}</h3>
+            <p class="mt-2 text-3xl font-bold text-blue-600">{{.Data.Stats.TotalEvents}}</p>
+        </div>
+        <div class="bg-white dark:bg-gray-900 rounded-lg shadow p-6">
+            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{{T "dashboard.transactions"}}</h3>
+            <p class="mt-2 text-3xl font-bold text-green-600">{{.Data.Stats.TotalTransactions}}</p>
+        </div>
+        <div class="bg-white dark:bg-gray-900 rounded-lg shadow p-6">
+            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{{T "dashboard.releases"}}</h3>
+            <p class="mt-2 text-3xl font-bold text-purple-600">{{.Data.Stats.TotalReleases}}</p>
+        </div>
+    </div>
+
+    <div class="mt-8">
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">{{T "dashboard.projects"}}</h2>
+        {{if .Data.Projects}}
+        {{.Data.Pagination}}
+        <div class="bg-white dark:bg-gray-900 rounded-lg shadow overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{T "table.name"}}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{T "nav.organizations"}}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{T "table.platform"}}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{T "table.actions"}}</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
+                    {{range .Data.Projects}}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                        <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">{{.Name}}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{{.OrgName}}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{{.Platform}}</td>
+                        <td class="px-6 py-4 text-sm">
+                            <a href="/projects/{{.ID}}/issues" class="text-blue-600 hover:text-blue-500">{{T "nav.issues"}}</a>
+                            <span class="text-gray-300 dark:text-gray-600 mx-2">|</span>
+                            <a href="/projects/{{.ID}}/transactions" class="text-blue-600 hover:text-blue-500">{{T "nav.apm"}}</a>
+                            <span class="text-gray-300 dark:text-gray-600 mx-2">|</span>
+                            <a href="/projects/{{.ID}}/logs" class="text-blue-600 hover:text-blue-500">{{T "nav.logs"}}</a>
+                            <span class="text-gray-300 dark:text-gray-600 mx-2">|</span>
+                            <a href="/projects/{{.ID}}/releases" class="text-blue-600 hover:text-blue-500">{{T "nav.releases"}}</a>
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+        {{else}}
+        <p class="mt-4 text-gray-500 dark:text-gray-400">{{T "dashboard.no_projects"}}</p>
+        {{end}}
+    </div>
+
+    <div class="mt-8">
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">{{T "dashboard.recent_issues"}}</h2>
+        {{if .Data.Stats.RecentIssues}}
+        <div class="mt-4 bg-white dark:bg-gray-900 rounded-lg shadow overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{T "table.title"}}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{T "nav.organizations"}}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{T "table.level"}}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{T "table.status"}}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{T "table.events"}}</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
+                    {{range .Data.Stats.RecentIssues}}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                        <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">
+                            <a href="/projects/{{.ProjectID}}/issues/{{.ID}}" class="hover:text-blue-600">{{.Title}}</a>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{{.OrgName}}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full
+                                {{if eq .Level "error"}}bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300
+                                {{else if eq .Level "fatal"}}bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300
+                                {{else if eq .Level "warning"}}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300
+                                {{else}}bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200{{end}}">{{.Level}}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full
+                                {{if eq .Status "unresolved"}}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300
+                                {{else}}bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300{{end}}">{{.Status}}</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{{.Count}}</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+        {{else}}
+        <p class="mt-4 text-gray-500 dark:text-gray-400">{{T "issues.no_issues"}}</p>
+        {{end}}
+    </div>
+</div>
+{{end}}

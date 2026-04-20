@@ -1,0 +1,20 @@
+{{define "stacktrace.html"}}
+<div class="space-y-0">
+    {{range .}}
+    <div class="flex items-start py-1 px-2 {{if .Crashed}}bg-red-900/30 border-l-2 border-red-500{{end}}">
+        <span class="text-gray-500 w-8 text-right mr-4 select-none">{{.FrameNo}}</span>
+        <div class="flex-1 min-w-0">
+            <span class="{{if .Crashed}}text-red-400{{else}}text-gray-300{{end}}">{{.Function}}</span>
+            <span class="text-gray-600"> {{T "stacktrace.at"}} </span>
+            <span class="text-cyan-400">{{.File}}</span>
+            {{if .Line}}
+            <span class="text-yellow-400">:{{.Line}}</span>
+            {{end}}
+        </div>
+        {{if .Module}}
+        <span class="text-gray-600 text-xs ml-4">{{.Module}}</span>
+        {{end}}
+    </div>
+    {{end}}
+</div>
+{{end}}
