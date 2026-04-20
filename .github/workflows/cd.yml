@@ -25,6 +25,7 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+          check-latest: true
 
       - name: Run tests
         run: go test -race ./...
